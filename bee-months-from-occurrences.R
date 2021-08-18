@@ -57,10 +57,11 @@ trimOccurrenceData <- trimOccurrenceData %>%
 unique(trimOccurrenceData$scientificName)
 unique(trimOccurrenceData$genus)
 
-
 #update scientificName to remove subgenus. Also include synonyms?
 trimOccurrenceData <- trimOccurrenceData %>%
   mutate(cleaned_scientificName = scientificName)
+
+#TODO add synonyms for scientific names of bees
 
 trimOccurrenceData$cleaned_scientificName <- gsub("[(].+[)].",'',trimOccurrenceData$cleaned_scientificName)
 
@@ -154,3 +155,5 @@ Dec_match <- filter(trimOccurrenceData, eventMonth == "12")
 phenologyTable$Dec<-Dec_match[match(phenologyTable$scientificName, Dec_match$cleaned_scientificName),90]
 
 phenologyTable <- replace(phenologyTable, is.na(phenologyTable), 0)
+
+write_tsv(phenologyTable,"phenologyTable.tsv")
