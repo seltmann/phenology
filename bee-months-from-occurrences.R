@@ -1,5 +1,6 @@
 #uses occurrence records to create spreadsheet when bees are active
 #Katja C. Seltmann (enicospilus@gmail.com) August 2021 - phenology
+#TODO: months for plants and people
 
 # Load libraries
 library(tidyverse)
@@ -55,6 +56,8 @@ trimOccurrenceData <- trimOccurrenceData %>%
 #################name matching####################
 #check the results
 unique(trimOccurrenceData$scientificName)
+unique(trimOccurrenceData$recordedBy)
+
 unique(trimOccurrenceData$genus)
 
 #update scientificName to remove subgenus. Also include synonyms?
