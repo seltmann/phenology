@@ -56,8 +56,6 @@ trimOccurrenceData <- trimOccurrenceData %>%
 #################name matching####################
 #check the results
 unique(trimOccurrenceData$scientificName)
-unique(trimOccurrenceData$recordedBy)
-
 unique(trimOccurrenceData$genus)
 
 #update scientificName to remove subgenus. Also include synonyms?
@@ -160,3 +158,11 @@ phenologyTable$Dec<-Dec_match[match(phenologyTable$scientificName, Dec_match$cle
 phenologyTable <- replace(phenologyTable, is.na(phenologyTable), 0)
 
 write_tsv(phenologyTable,"phenologyTable.tsv")
+
+
+##############################
+#look for collectors
+##############################
+collectors<- data.frame(unique(trimOccurrenceData$recordedBy))
+write_tsv(collectors,"collectors.tsv")
+
