@@ -64,7 +64,7 @@ trimOccurrenceData <- trimOccurrenceData %>%
 
 #TODO add synonyms for scientific names of bees
 
-trimOccurrenceData$cleaned_scientificName <- gsub("[(].+[)].",'',trimOccurrenceData$cleaned_scientificName)
+trimOccurrenceData$cleaned_scientificName <- gsub(".[(].+[)]",'',trimOccurrenceData$cleaned_scientificName)
 
 trimOccurrenceData$cleaned_scientificName <- as.factor(trimOccurrenceData$cleaned_scientificName)    
 
@@ -74,16 +74,14 @@ class(trimOccurrenceData$cleaned_scientificName)
 
 ###############test for using gsub examples#################
 string_test <- c('Halictus tripartitus','Lasioglossum (Evylaeus) sp. E', 'Lasioglossum (Dialictus)','Andrena (Derandrena) vandykei')
-string_test <- gsub("[(].+[)].",'',string_test)
-
-
+string_test <- gsub(".[(].+[)]",'',string_test)
 
 ##############################################
 ##########Create New Phenology Table##########
 #create data frame table with 0=absent, 1=present, species and months. Start by setting all values to 0
 
 nrow(taxa)
-scientificName <- taxa$ScientificName
+scientificName <- gsub(".[(].+[)]",'',taxa$ScientificName)
 Jan <- replicate(142, 0)
 Feb <- replicate(142, 0)
 Mar <- replicate(142, 0)
@@ -101,11 +99,6 @@ phenologyTable <- data.frame(scientificName, Jan, Feb, Mar, Apr, May, Jun, Jul, 
 
 colnames(phenologyTable)
 class(phenologyTable$scientificName)
-
-#make list of names we are looking for
-#checklistNames <- phenologyTable$scientificName
-#trim full dataset to only be those with names we are interested
-#onlyListNames <- filter(trimOccurrenceData, scientificName %in% checklistNames)
 
 ######Jan#######
 Jan_match <- filter(trimOccurrenceData, eventMonth == "1")
@@ -157,11 +150,67 @@ phenologyTable$Dec<-Dec_match[match(phenologyTable$scientificName, Dec_match$cle
 
 phenologyTable <- replace(phenologyTable, is.na(phenologyTable), 0)
 
+phenologyTable<- phenologyTable2
+
+##############################
+#fill in gaps so that all occurrences are contiguous
+##############################
+
+phenologyTable<- phenologyTable %>%
+  mutate(Jan = if_else(phenologyTable$Jan == "0" & phenologyTable$Dec == "1" & phenologyTable$Feb == "1","1",phenologyTable$Jan))
+
+#test for finding missing values
+#filter(phenologyTable,phenologyTable$Jan == "0" & phenologyTable$Dec == "1" & phenologyTable$Feb == "1")
+
+phenologyTable<- phenologyTable %>%
+  mutate(Feb = if_else(phenologyTable$Feb == "0" & phenologyTable$Jan == "1" & phenologyTable$Mar == "1","1",phenologyTable$Feb))
+
+phenologyTable<- phenologyTable %>%
+  mutate(Mar = if_else(phenologyTable$Mar == "0" & phenologyTable$Feb == "1" & phenologyTable$Apr == "1","1",phenologyTable$Mar))
+
+phenologyTable<- phenologyTable %>%
+  mutate(Apr = if_else(phenologyTable$Apr == "0" & phenologyTable$Mar == "1" & phenologyTable$May == "1","1",phenologyTable$Apr))
+
+phenologyTable<- phenologyTable %>%
+  mutate(May = if_else(phenologyTable$May == "0" & phenologyTable$Apr == "1" & phenologyTable$Jun == "1","1",phenologyTable$May))
+
+phenologyTable<- phenologyTable %>%
+  mutate(Jun = if_else(phenologyTable$Jun == "0" & phenologyTable$May == "1" & phenologyTable$Jul == "1","1",phenologyTable$Jun))
+
+phenologyTable<- phenologyTable %>%
+  mutate(Jul = if_else(phenologyTable$Jul == "0" & phenologyTable$Jun == "1" & phenologyTable$Aug == "1","1",phenologyTable$Jul))
+
+phenologyTable<- phenologyTable %>%
+  mutate(Aug = if_else(phenologyTable$Aug == "0" & phenologyTable$Jul == "1" & phenologyTable$Sep == "1","1",phenologyTable$Aug))
+
+phenologyTable<- phenologyTable %>%
+  mutate(Sep = if_else(phenologyTable$Sep == "0" & phenologyTable$Aug == "1" & phenologyTable$Oct == "1","1",phenologyTable$Sep))
+
+phenologyTable<- phenologyTable %>%
+  mutate(Oct = if_else(phenologyTable$Oct == "0" & phenologyTable$Sep == "1" & phenologyTable$Nov == "1","1",phenologyTable$Oct))
+
+phenologyTable<- phenologyTable %>%
+  mutate(Nov = if_else(phenologyTable$Nov == "0" & phenologyTable$Oct == "1" & phenologyTable$Dec == "1","1",phenologyTable$Nov))
+
+phenologyTable<- phenologyTable %>%
+  mutate(Dec = if_else(phenologyTable$Dec == "0" & phenologyTable$Nov == "1" & phenologyTable$Jan == "1","1",phenologyTable$Dec))
+
+#write table
 write_tsv(phenologyTable,"phenologyTable.tsv")
+
+##############################
+#if day of month is earlier, than include month before
+##############################
 
 
 ##############################
-#look for collectors
+#scientific names improve matching
+##############################
+
+
+
+##############################
+#look for collectors to create a clean map of those collectors
 ##############################
 collectors<- data.frame(unique(trimOccurrenceData$recordedBy))
 write_tsv(collectors,"collectors.tsv")
