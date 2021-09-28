@@ -17,7 +17,7 @@ taxa <- read.delim("bees-SCI_2021_08_04.tsv", stringsAsFactors = TRUE, header = 
 head(taxa$Family)
 colnames(taxa)
 
-allOccurrenceData <- read.csv("Hymenoptera-SCI/occurrences.csv", header = TRUE, stringsAsFactors = TRUE, sep = ",", quote = "\"")
+allOccurrenceData <- read.csv("data/California/occurrences.tab", header = TRUE, stringsAsFactors = TRUE, sep = "\t", quote = "\"")
 head(allOccurrenceData)
 colnames(allOccurrenceData)
 
@@ -33,6 +33,8 @@ unique(trimOccurrenceData$family)
 
 #check the class of eventDate
 class(trimOccurrenceData$eventDate)
+
+colnames(trimOccurrenceData)
 
 #change to class date. Will throw a warning that some fail to parse. This is ok, those are empty strings.
 trimOccurrenceData <- trimOccurrenceData %>%
@@ -66,11 +68,40 @@ trimOccurrenceData <- trimOccurrenceData %>%
 
 trimOccurrenceData$cleaned_scientificName <- gsub(".[(].+[)]",'',trimOccurrenceData$cleaned_scientificName)
 
-trimOccurrenceData$cleaned_scientificName <- as.factor(trimOccurrenceData$cleaned_scientificName)    
+#trimOccurrenceData$cleaned_scientificName <- as.factor(trimOccurrenceData$cleaned_scientificName)    
 
 colnames(trimOccurrenceData)
 unique(trimOccurrenceData$cleaned_scientificName)
 class(trimOccurrenceData$cleaned_scientificName)
+
+
+##############################
+#scientific names improve matching
+##############################
+#not able to find California recoreds for:
+#Nomada semisuavis
+#Dioxys productus cismontanicus
+
+#Heterosarus californicus not found in data = Pseudopanurgus californicus
+trimOccurrenceData<- trimOccurrenceData %>%
+  mutate(cleaned_scientificName = if_else(trimOccurrenceData$cleaned_scientificName == "Pseudopanurgus californicus","Heterosarus californicus",trimOccurrenceData$cleaned_scientificName))
+
+#Exomalopsis cerei = Anthophorula cerei
+trimOccurrenceData<- trimOccurrenceData %>%
+  mutate(cleaned_scientificName = if_else(trimOccurrenceData$cleaned_scientificName == "Anthophorula cerei","Exomalopsis cerei",trimOccurrenceData$cleaned_scientificName))
+
+#Nomada semisuavis
+
+#Lasioglossum miguelense = Evylaeus miguelensis
+trimOccurrenceData<- trimOccurrenceData %>%
+  mutate(cleaned_scientificName = if_else(trimOccurrenceData$cleaned_scientificName == "Evylaeus miguelensis","Lasioglossum miguelense",trimOccurrenceData$cleaned_scientificName))
+
+#Ashmeadiella cactorum basalis = Ashmeadiella cactorum
+trimOccurrenceData<- trimOccurrenceData %>%
+  mutate(cleaned_scientificName = if_else(trimOccurrenceData$cleaned_scientificName == "Ashmeadiella cactorum","Ashmeadiella cactorum basalis",trimOccurrenceData$cleaned_scientificName))
+
+#Ashmeadiella chumashae
+#Dioxys productus cismontanicus
 
 ###############test for using gsub examples#################
 string_test <- c('Halictus tripartitus','Lasioglossum (Evylaeus) sp. E', 'Lasioglossum (Dialictus)','Andrena (Derandrena) vandykei')
@@ -102,51 +133,51 @@ class(phenologyTable$scientificName)
 
 ######Jan#######
 Jan_match <- filter(trimOccurrenceData, eventMonth == "1")
-phenologyTable$Jan<-Jan_match[match(phenologyTable$scientificName, Jan_match$cleaned_scientificName),90]
+phenologyTable$Jan<-Jan_match[match(phenologyTable$scientificName, Jan_match$cleaned_scientificName),91]
 
 ######Feb#######
 Feb_match <- filter(trimOccurrenceData, eventMonth == "2")
-phenologyTable$Feb<-Feb_match[match(phenologyTable$scientificName, Feb_match$cleaned_scientificName),90]
+phenologyTable$Feb<-Feb_match[match(phenologyTable$scientificName, Feb_match$cleaned_scientificName),91]
 
 ######Mar#######
 Mar_match <- filter(trimOccurrenceData, eventMonth == "3")
-phenologyTable$Mar<-Mar_match[match(phenologyTable$scientificName, Mar_match$cleaned_scientificName),90]
+phenologyTable$Mar<-Mar_match[match(phenologyTable$scientificName, Mar_match$cleaned_scientificName),91]
 
 ######Apr#######
 Apr_match <- filter(trimOccurrenceData, eventMonth == "4")
-phenologyTable$Apr<-Apr_match[match(phenologyTable$scientificName, Apr_match$cleaned_scientificName),90]
+phenologyTable$Apr<-Apr_match[match(phenologyTable$scientificName, Apr_match$cleaned_scientificName),91]
 
 ######May#######
 May_match <- filter(trimOccurrenceData, eventMonth == "5")
-phenologyTable$May<-May_match[match(phenologyTable$scientificName, May_match$cleaned_scientificName),90]
+phenologyTable$May<-May_match[match(phenologyTable$scientificName, May_match$cleaned_scientificName),91]
 
 ######Jun#######
 Jun_match <- filter(trimOccurrenceData, eventMonth == "6")
-phenologyTable$Jun<-Jun_match[match(phenologyTable$scientificName, Jun_match$cleaned_scientificName),90]
+phenologyTable$Jun<-Jun_match[match(phenologyTable$scientificName, Jun_match$cleaned_scientificName),91]
 
 ######Jul#######
 Jul_match <- filter(trimOccurrenceData, eventMonth == "7")
-phenologyTable$Jul<-Jul_match[match(phenologyTable$scientificName, Jul_match$cleaned_scientificName),90]
+phenologyTable$Jul<-Jul_match[match(phenologyTable$scientificName, Jul_match$cleaned_scientificName),91]
 
 ######Aug#######
 Aug_match <- filter(trimOccurrenceData, eventMonth == "8")
-phenologyTable$Aug<-Aug_match[match(phenologyTable$scientificName, Aug_match$cleaned_scientificName),90]
+phenologyTable$Aug<-Aug_match[match(phenologyTable$scientificName, Aug_match$cleaned_scientificName),91]
 
 ######Sep#######
 Sep_match <- filter(trimOccurrenceData, eventMonth == "9")
-phenologyTable$Sep<-Sep_match[match(phenologyTable$scientificName, Sep_match$cleaned_scientificName),90]
+phenologyTable$Sep<-Sep_match[match(phenologyTable$scientificName, Sep_match$cleaned_scientificName),91]
 
 ######Oct#######
 Oct_match <- filter(trimOccurrenceData, eventMonth == "10")
-phenologyTable$Oct<-Oct_match[match(phenologyTable$scientificName, Oct_match$cleaned_scientificName),90]
+phenologyTable$Oct<-Oct_match[match(phenologyTable$scientificName, Oct_match$cleaned_scientificName),91]
 
 ######Nov#######
 Nov_match <- filter(trimOccurrenceData, eventMonth == "11")
-phenologyTable$Nov<-Nov_match[match(phenologyTable$scientificName, Nov_match$cleaned_scientificName),90]
+phenologyTable$Nov<-Nov_match[match(phenologyTable$scientificName, Nov_match$cleaned_scientificName),91]
 
 ######Dec#######
 Dec_match <- filter(trimOccurrenceData, eventMonth == "12")
-phenologyTable$Dec<-Dec_match[match(phenologyTable$scientificName, Dec_match$cleaned_scientificName),90]
+phenologyTable$Dec<-Dec_match[match(phenologyTable$scientificName, Dec_match$cleaned_scientificName),91]
 
 phenologyTable <- replace(phenologyTable, is.na(phenologyTable), 0)
 
@@ -196,17 +227,11 @@ phenologyTable<- phenologyTable %>%
   mutate(Dec = if_else(phenologyTable$Dec == "0" & phenologyTable$Nov == "1" & phenologyTable$Jan == "1","1",phenologyTable$Dec))
 
 #write table
-write_tsv(phenologyTable,"phenologyTable.tsv")
+write_tsv(phenologyTable,"All-California-phenologyTable.tsv")
 
 ##############################
 #if day of month is earlier, than include month before
 ##############################
-
-
-##############################
-#scientific names improve matching
-##############################
-
 
 
 ##############################
